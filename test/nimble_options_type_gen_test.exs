@@ -1,11 +1,11 @@
-defmodule NimbleOptionsTypeGenTest do
+defmodule NimbleOptionsTypeTest do
   use ExUnit.Case
 
   test "generate/2 generates a module attribute" do
     defmodule AModule do
-      require NimbleOptionsTypeGen
+      require NimbleOptionsType
 
-      NimbleOptionsTypeGen.generate(opts, [])
+      NimbleOptionsType.generate(opts, [])
 
       assert [
                {:type, {:"::", _, [{:opts, _, nil}, []]}, _}
@@ -15,9 +15,9 @@ defmodule NimbleOptionsTypeGenTest do
 
   test "generate/2 works for a simple option" do
     defmodule AModuleWithASimpleOption do
-      require NimbleOptionsTypeGen
+      require NimbleOptionsType
 
-      NimbleOptionsTypeGen.generate(opts, concurrency: [type: :pos_integer])
+      NimbleOptionsType.generate(opts, concurrency: [type: :pos_integer])
 
       assert [
                {:type,
@@ -29,9 +29,9 @@ defmodule NimbleOptionsTypeGenTest do
 
   test "generate/2 works for two options" do
     defmodule AModuleWithTwoOptions do
-      require NimbleOptionsTypeGen
+      require NimbleOptionsType
 
-      NimbleOptionsTypeGen.generate(opts,
+      NimbleOptionsType.generate(opts,
         module: [type: :mod_arg],
         concurrency: [type: :pos_integer]
       )
@@ -56,9 +56,9 @@ defmodule NimbleOptionsTypeGenTest do
 
   test "generate/2 marks opts as nonempty_list when opt is required" do
     defmodule AModuleWithARequiredOption do
-      require NimbleOptionsTypeGen
+      require NimbleOptionsType
 
-      NimbleOptionsTypeGen.generate(opts, concurrency: [required: true])
+      NimbleOptionsType.generate(opts, concurrency: [required: true])
 
       assert [
                {:type,

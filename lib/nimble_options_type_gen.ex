@@ -1,6 +1,6 @@
-defmodule NimbleOptionsTypeGen do
+defmodule NimbleOptionsType do
   @moduledoc """
-  Documentation for `NimbleOptionsTypeGen`.
+  Documentation for `NimbleOptionsType`.
   """
 
   @doc """

@@ -20,5 +20,5 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-nimble_options_type_gen-*.tar
+nimble_options_type-*.tar
 
