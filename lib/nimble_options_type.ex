@@ -34,13 +34,17 @@ defmodule NimbleOptionsType do
         key(key),
         type(definition[:type] || :any, definition[:keys]),
         definition[:required] || nonempty?,
+        definition[:deprecated] || false,
         acc
       )
     )
   end
 
+  # don't add deprecated options
+  defp add_type(_key, _type, _required?, deprecated?, acc) when deprecated?, do: acc
+
   # this is our first option
-  defp add_type(key, type, required?, nil) do
+  defp add_type(key, type, required?, _deprecated?, nil) do
     list_type =
       case required? do
         true -> :nonempty_list
@@ -51,7 +55,7 @@ defmodule NimbleOptionsType do
   end
 
   # we already have something
-  defp add_type(key, type, required?, {list_type, [], [existing_options_type]}) do
+  defp add_type(key, type, required?, _deprecated?, {list_type, [], [existing_options_type]}) do
     list_type =
       case list_type == :nonempty_list || required? do
         true -> :nonempty_list
