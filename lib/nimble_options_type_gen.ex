@@ -16,19 +16,20 @@ defmodule NimbleOptionsTypeGen do
     end
   end
 
-  defp get_types([], nil) do
+  defp get_types(schema, acc, nonempty? \\ false)
+  defp get_types([], nil, _nonempty?) do
     # why would anyone want to pass empty schema? dunno
     []
   end
 
-  defp get_types([], acc) do
+  defp get_types([], acc, _nonempty?) do
     acc
   end
 
-  defp get_types([{key, definition} | rest], acc) do
+  defp get_types([{key, definition} | rest], acc, nonempty?) do
     get_types(
       rest,
-      add_type(key, type(definition[:type] || :any), definition[:required] || false, acc)
+      add_type(key, type(definition[:type] || :any, definition[:keys]), definition[:required] || nonempty?, acc)
     )
   end
 
@@ -58,11 +59,9 @@ defmodule NimbleOptionsTypeGen do
     [{:|, [], [a, b]}]
   end
 
-  defp type(type)
+  defp type(type, _)
        when type in [
               :any,
-              :keyword_list,
-              :non_empty_keyword_list,
               :atom,
               :boolean,
               :non_neg_integer,
@@ -72,13 +71,21 @@ defmodule NimbleOptionsTypeGen do
             ],
        do: {type, [], []}
 
-  defp type(:mod_arg), do: quote(do: {module(), list(any())})
-  defp type(:string), do: quote(do: String.t())
+  defp type(type, keys) when type in [:keyword_list, :non_empty_keyword_list] do
+    nonempty? = case type do
+      :keyword_list -> false
+      :non_empty_keyword_list -> true
+    end
+    get_types(keys, nil, nonempty?)
+  end
 
-  defp type({:fun, arity}),
+  defp type(:mod_arg, _), do: quote(do: {module(), list(any())})
+  defp type(:string, _), do: quote(do: String.t())
+
+  defp type({:fun, arity}, _),
     do: [{:->, [], [Enum.map(1..arity, fn _ -> {:any, [], []} end), {:any, [], []}]}]
 
-  defp type({:custom, _, _, _}), do: quote(do: any())
+  defp type({:custom, _, _, _}, _), do: quote(do: any())
   # TODO this is pobably wrong
-  defp type({:one_of, choices}), do: Enum.reduce(choices, &type_or_type/2)
+  defp type({:one_of, choices}, _), do: Enum.reduce(choices, &type_or_type/2)
 end
