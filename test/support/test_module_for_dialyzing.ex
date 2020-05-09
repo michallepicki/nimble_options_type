@@ -88,6 +88,6 @@ defmodule NimbleOptionsTypeGen.TestModuleForDialyzing do
     # (simple_required_opts()) :: :world
 
     # No warnings here:
-    hello3([concurrency: 3])
+    hello3(concurrency: 3)
   end
 end
