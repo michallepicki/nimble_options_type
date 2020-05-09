@@ -6,6 +6,8 @@ defmodule NimbleOptionsTypeTest do
       require NimbleOptionsType
 
       NimbleOptionsType.generate(opts, [])
+      # results in:
+      # @type opts :: []
 
       assert [
                {:type, {:"::", _, [{:opts, _, nil}, []]}, _}
@@ -18,6 +20,8 @@ defmodule NimbleOptionsTypeTest do
       require NimbleOptionsType
 
       NimbleOptionsType.generate(opts, concurrency: [type: :pos_integer])
+      # results in:
+      # @type opts :: list({:concurrency, pos_integer()})
 
       assert [
                {:type,
@@ -35,6 +39,8 @@ defmodule NimbleOptionsTypeTest do
         module: [type: :mod_arg],
         concurrency: [type: :pos_integer]
       )
+      # results in:
+      # @type opts :: list({:concurrency, pos_integer()} | {:module, {module(), list(any())})
 
       assert [
                {:type,
@@ -59,6 +65,8 @@ defmodule NimbleOptionsTypeTest do
       require NimbleOptionsType
 
       NimbleOptionsType.generate(opts, concurrency: [required: true])
+      # results in:
+      # @type opts :: nonempty_list({:concurrency, any()})
 
       assert [
                {:type,
@@ -73,6 +81,8 @@ defmodule NimbleOptionsTypeTest do
       require NimbleOptionsType
 
       NimbleOptionsType.generate(opts, concurrency: [type: :pos_integer, deprecated: true])
+      # results in:
+      # @type opts :: []
 
       assert [
                {:type, {:"::", _, [{:opts, _, nil}, []]}, _}

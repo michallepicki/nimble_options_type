@@ -8,7 +8,7 @@ defmodule NimbleOptionsType do
   """
   defmacro generate(type_name, schema) do
     # TODO there's probably some unnecessary macro sillyness here
-    typespec = get_types(schema, nil)
+    typespec = get_types(schema, nil, false)
     typespec = Macro.expand(typespec, __CALLER__)
 
     quote do
@@ -16,10 +16,10 @@ defmodule NimbleOptionsType do
     end
   end
 
-  defp get_types(schema, acc, nonempty? \\ false)
+  defp get_types(schema, acc, nonempty?)
 
   defp get_types([], nil, _nonempty?) do
-    # why would anyone want to pass empty schema? dunno
+    # why would anyone want to have always empty options? dunno
     []
   end
 
@@ -36,7 +36,8 @@ defmodule NimbleOptionsType do
         definition[:required] || nonempty?,
         definition[:deprecated] || false,
         acc
-      )
+      ),
+      nonempty?
     )
   end
 
