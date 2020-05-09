@@ -5,7 +5,7 @@ defmodule NimbleOptionsTypeGen.MixProject do
     [
       app: :nimble_options_type_gen,
       version: "0.2.0",
-      elixir: "~> 1.11-dev",
+      elixir: "~> 1.0",
       start_permanent: Mix.env() == :prod,
       deps: []
     ]
