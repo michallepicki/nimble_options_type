@@ -1,0 +1,20 @@
+name: test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: docker://hexpm/elixir:1.10.3-erlang-22.3.4-alpine-3.11.3
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Compile and run tests
+      run: |
+        mix test
