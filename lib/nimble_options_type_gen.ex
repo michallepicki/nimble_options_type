@@ -17,6 +17,7 @@ defmodule NimbleOptionsTypeGen do
   end
 
   defp get_types(schema, acc, nonempty? \\ false)
+
   defp get_types([], nil, _nonempty?) do
     # why would anyone want to pass empty schema? dunno
     []
@@ -29,7 +30,12 @@ defmodule NimbleOptionsTypeGen do
   defp get_types([{key, definition} | rest], acc, nonempty?) do
     get_types(
       rest,
-      add_type(key, type(definition[:type] || :any, definition[:keys]), definition[:required] || nonempty?, acc)
+      add_type(
+        key(key),
+        type(definition[:type] || :any, definition[:keys]),
+        definition[:required] || nonempty?,
+        acc
+      )
     )
   end
 
@@ -59,6 +65,9 @@ defmodule NimbleOptionsTypeGen do
     [{:|, [], [a, b]}]
   end
 
+  defp key(:*), do: quote(do: atom())
+  defp key(atom), do: atom
+
   defp type(type, _)
        when type in [
               :any,
@@ -72,10 +81,12 @@ defmodule NimbleOptionsTypeGen do
        do: {type, [], []}
 
   defp type(type, keys) when type in [:keyword_list, :non_empty_keyword_list] do
-    nonempty? = case type do
-      :keyword_list -> false
-      :non_empty_keyword_list -> true
-    end
+    nonempty? =
+      case type do
+        :keyword_list -> false
+        :non_empty_keyword_list -> true
+      end
+
     get_types(keys, nil, nonempty?)
   end
 
