@@ -1,7 +1,7 @@
 defmodule NimbleOptionsType.TestModuleForDialyzing do
   require NimbleOptionsType
 
-  NimbleOptionsType.generate(opts, [name: [required: true, type: :atom], an_option: [], other_option: []])
+  NimbleOptionsType.generate(:opts, [name: [required: true, type: :atom], an_option: [], other_option: []])
   @spec hello(opts()) :: :world
   def hello(_opts), do: :world
 

@@ -7,13 +7,9 @@ defmodule NimbleOptionsType do
   Generates a `@type` spec for `type_name` according to given `NimbleOptions` `schema`.
   """
   defmacro generate(type_name, schema) do
-    # TODO there's probably some unnecessary macro sillyness here
     typespec = get_types(schema, nil, false)
-    typespec = Macro.expand(typespec, __CALLER__)
 
-    quote do
-      @type unquote(type_name) :: unquote(typespec)
-    end
+    {:@, [], [{:type, [], [{:"::", [], [{type_name, [], []}, typespec]}]}]}
   end
 
   defp get_types(schema, acc, nonempty?)
