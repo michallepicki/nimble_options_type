@@ -13,6 +13,6 @@ defmodule NimbleOptionsType.TestModuleForDialyzing do
     hello([an_option: 1, other_option: 2])
 
     # Dialyzer catches this one:
-    hello([])
+    # hello([])
   end
 end
