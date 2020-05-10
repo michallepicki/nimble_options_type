@@ -1,17 +1,20 @@
 defmodule NimbleOptionsTypeTest do
   use ExUnit.Case
 
-  test "generate/2 generates a module attribute" do
+  test "generate/2 generates the type spec and a module attribute with the schema" do
     defmodule ModuleWithEmptyOptions do
       require NimbleOptionsType
 
       NimbleOptionsType.generate(:opts, [])
       # results in:
       # @type opts() :: []
+      # @opts []
 
       assert [
                {:type, {:"::", _, [{:opts, _, []}, []]}, _}
              ] = @type
+
+      assert [] == @opts
     end
   end
 
@@ -22,12 +25,15 @@ defmodule NimbleOptionsTypeTest do
       NimbleOptionsType.generate(:opts, concurrency: [type: :pos_integer])
       # results in:
       # @type opts() :: list({:concurrency, pos_integer()})
+      # @opts [concurrency: [type: :pos_integer]]
 
       assert [
                {:type,
                 {:"::", _, [{:opts, _, []}, {:list, _, [{:concurrency, {:pos_integer, _, []}}]}]},
                 _}
              ] = @type
+
+      assert [concurrency: [type: :pos_integer]] == @opts
     end
   end
 
@@ -42,6 +48,7 @@ defmodule NimbleOptionsTypeTest do
 
       # results in:
       # @type opts() :: list({:concurrency, pos_integer()} | {:module, {module(), list(any())})
+      # @opts [module: [type: :mod_arg], concurrency: [type: :pos_integer]]
 
       assert [
                {:type,
@@ -58,6 +65,8 @@ defmodule NimbleOptionsTypeTest do
                     ]}
                  ]}, _}
              ] = @type
+
+      assert [module: [type: :mod_arg], concurrency: [type: :pos_integer]] == @opts
     end
   end
 
@@ -68,12 +77,15 @@ defmodule NimbleOptionsTypeTest do
       NimbleOptionsType.generate(:opts, concurrency: [required: true])
       # results in:
       # @type opts() :: nonempty_list({:concurrency, any()})
+      # @opts [concurrency: [required: true]]
 
       assert [
                {:type,
                 {:"::", _,
                  [{:opts, _, []}, {:nonempty_list, _, [{:concurrency, {:any, _, []}}]}]}, _}
              ] = @type
+
+      assert [concurrency: [required: true]] == @opts
     end
   end
 
@@ -84,10 +96,30 @@ defmodule NimbleOptionsTypeTest do
       NimbleOptionsType.generate(:opts, concurrency: [type: :pos_integer, deprecated: true])
       # results in:
       # @type opts() :: []
+      # @opts [concurrency: [type: :pos_integer, deprecated: true]]
 
       assert [
                {:type, {:"::", _, [{:opts, _, []}, []]}, _}
              ] = @type
+
+      assert [concurrency: [type: :pos_integer, deprecated: true]] == @opts
+    end
+  end
+
+  test "generate/2 works for :*" do
+    defmodule ModuleWithWildcardOptions do
+      require NimbleOptionsType
+
+      NimbleOptionsType.generate(:opts, *: [])
+      # results in:
+      # @type opts() :: list({atom(), any()})
+      # @opts [*: []]
+      assert [
+               {:type,
+                {:"::", _, [{:opts, _, []}, {:list, _, [{{:atom, _, []}, {:any, _, []}}]}]}, _}
+             ] = @type
+
+      assert [*: []] == @opts
     end
   end
 
@@ -121,6 +153,21 @@ defmodule NimbleOptionsTypeTest do
       #              | {:module, {module(), list(any())}}
       #            )}
       #         )
+      # @opts [
+      #   producer: [
+      #     type: :non_empty_keyword_list,
+      #     keys: [
+      #       module: [type: :mod_arg],
+      #       rate_limiting: [
+      #         type: :non_empty_keyword_list,
+      #         keys: [
+      #           allowed_messages: [type: :pos_integer],
+      #           interval: [required: true, type: :pos_integer]
+      #         ]
+      #       ]
+      #     ]
+      #   ]
+      # ]
 
       assert [
                {:type,
@@ -149,6 +196,24 @@ defmodule NimbleOptionsTypeTest do
                     ]}
                  ]}, _}
              ] = @type
+
+      assert [
+               producer: [
+                 type: :non_empty_keyword_list,
+                 keys: [
+                   module: [type: :mod_arg],
+                   rate_limiting: [
+                     type: :non_empty_keyword_list,
+                     keys: [
+                       allowed_messages: [type: :pos_integer],
+                       interval: [required: true, type: :pos_integer]
+                     ]
+                   ]
+                 ]
+               ]
+             ] == @opts
     end
   end
+
+  # TODO how to deal with recursive types?
 end

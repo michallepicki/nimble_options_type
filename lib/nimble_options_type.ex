@@ -9,7 +9,10 @@ defmodule NimbleOptionsType do
   defmacro generate(type_name, schema) do
     typespec = get_types(schema, nil, false)
 
-    {:@, [], [{:type, [], [{:"::", [], [{type_name, [], []}, typespec]}]}]}
+    [
+      {:@, [], [{:type, [], [{:"::", [], [{type_name, [], []}, typespec]}]}]},
+      {:@, [], [{type_name, [], [schema]}]}
+    ]
   end
 
   defp get_types(schema, acc, nonempty?)
