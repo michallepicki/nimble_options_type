@@ -1,21 +1,3 @@
 # NimbleOptionsType
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `nimble_options_type` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:nimble_options_type, "~> 0.2.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/nimble_options_type](https://hexdocs.pm/nimble_options_type).
-
+This was an experiment to automatically generate Dialyzer type specifications for [nimble_options](https://github.com/dashbitco/nimble_options). While it is possible in general, macro code would have to be a bit complicated in order to support recursive types. Another major flaw is the fact that NimbleOptions uses keyword lists instead of maps: for keyword lists, it is not possible to specify in Dialyzer type specs whether a field is required or optional.
